@@ -118,15 +118,15 @@ class MyServer(BaseHTTPRequestHandler):
         init_gpio(GPIO_PIN)
 
         if post_id == "submit":     #this is the "backend" stuff for when a browser posts the buzz button being pressed.
+            print("Relay will {}".format(post_data))
             if post_data == 'Buzz':
                 relay_on(GPIO_PIN)
                 time.sleep(2)
                 relay_off(GPIO_PIN)
-            print("Relay will {}".format(post_data))
 
         if post_id == "restart": 
-            os.popen("sudo reboot")
             print("Relay will {}".format(post_data))
+            os.popen("sudo reboot")
 
         if post_id == "add-time": #add time to db
             try:
@@ -170,7 +170,7 @@ def init_gpio(pin):
     GPIO.setup(pin, GPIO.OUT)
 
 
-def relay_on(pin): #relay on function, if relay gets stuck then it will retry until it gets unstuck. if it tries more than 300 times (30 seconds) it will give up.
+def relay_on(pin): #relay on function, if relay gets stuck then it will retry until it gets unstuck. if it tries more than 100 times (30 seconds) it will give up.
     global send_err
     attempt_count = 0
     while GPIO.input(pin) != 1:
