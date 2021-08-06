@@ -10,6 +10,8 @@ host_port = 8000
 
 dates = {}
 
+send_err = ""
+
 class MyServer(BaseHTTPRequestHandler):
     """ A special implementation of BaseHTTPRequestHander for reading data from
         and control GPIO of a Raspberry Pi
@@ -33,6 +35,7 @@ class MyServer(BaseHTTPRequestHandler):
         """ do_GET() can be tested using curl command 
             'curl http://server-ip-address:port' 
         """
+        global send_err
         html = '''
             <html>
             <body style="width:960px; margin: 20px auto;">
@@ -51,13 +54,14 @@ class MyServer(BaseHTTPRequestHandler):
                 <input type="text" id="del-time" name="del-time"><br>
             </form>
            
+            <b>{}</b>
+            <br>
             <table style="width:50%">
                 <tr>
                     <th>Time</th>
                     <th>Belltype</th>
                 </tr>
-                {} 
-            
+                {}
             </body>
             </html>
         '''
@@ -72,7 +76,10 @@ class MyServer(BaseHTTPRequestHandler):
 
         temp = os.popen("/opt/vc/bin/vcgencmd measure_temp").read()
         self.do_HEAD()
-        self.wfile.write(html.format(temp[5:], times_html).encode("utf-8"))
+        print(send_err)
+        self.wfile.write(html.format(temp[5:], send_err, times_html).encode("utf-8"))
+        send_err = ""
+
 
     def do_POST(self):
         """ do_POST() can be tested using curl command 
@@ -83,12 +90,11 @@ class MyServer(BaseHTTPRequestHandler):
         print(post_data)
         post_id = post_data.split('=')[0]
         post_data = post_data.split('=')[1]    # Only keep the value
-        
-        # GPIO setup
+       
+        global send_err
 
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-        GPIO.setup(26, GPIO.OUT)
+        # GPIO setup
+        init_gpio(26)
 
         if post_id == "submit":
             if post_data == 'Buzz':
@@ -100,20 +106,35 @@ class MyServer(BaseHTTPRequestHandler):
         #for 12 hour time, use (%I-%M-%S %p)
 
         if post_id == "add-time":
-            newdate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M")
-            print(newdate)
-            dates[newdate.strftime("%H:%M")] = "default"
-    
+            try:
+                newdate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M")
+                print(newdate)
+                dates[newdate.strftime("%H:%M")] = "default"
+            except ValueError:
+                send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\""
+                self._redirect('/')
+
         if post_id == "del-time":
-            deldate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M")
-            print(deldate.strftime("%H:%M"))
-            del dates[deldate.strftime("%H:%M")]
-        
+            try:
+                deldate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M")
+                print(deldate.strftime("%H:%M"))
+                del dates[deldate.strftime("%H:%M")]
+            except (ValueError, KeyError):
+                send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\""
+                self._redirect('/')
+
         with open('timedb.json', 'w+') as fp: # On post, save time db to json to be safe.
             json.dump(dates, fp)
         for d in dates:
             os.popen("(crontab -l; echo {} {} \* \* 1-5 /usr/bin/python3 /home/pi/python/webserver/buzz.py) | crontab -".format(d.split(":")[1], d.split(":")[0]))
         self._redirect('/')    # Redirect back to the root url
+
+
+def init_gpio(pin):
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setup(pin, GPIO.OUT)
+
 
 def relay_on(pin):
     attempt_count = 0
@@ -132,6 +153,10 @@ def relay_off(pin):
         attempt_count+=1
         if attempt_count > 1:
             print("relay stuck, retrying off")
+
+
+
+
 
 if __name__ == '__main__':
     try:
