@@ -87,7 +87,6 @@ class MyServer(BaseHTTPRequestHandler):
         """
         content_length = int(self.headers['Content-Length'])    # Get the size of data
         post_data = self.rfile.read(content_length).decode("utf-8")   # Get the data
-        print(post_data)
         post_id = post_data.split('=')[0]
         post_data = post_data.split('=')[1]    # Only keep the value
        
@@ -108,7 +107,6 @@ class MyServer(BaseHTTPRequestHandler):
         if post_id == "add-time": #add time to db
             try:
                 newdate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M") #using datetime is an easy way of parsing dates so i dont need to regex things myself
-                print(newdate)
                 dates[newdate.strftime("%H:%M")] = "default"
             except ValueError:  #if not a valid date then it will complain
                 send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\""
@@ -117,7 +115,6 @@ class MyServer(BaseHTTPRequestHandler):
         if post_id == "del-time": #rm time from db
             try:
                 deldate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M")
-                print(deldate.strftime("%H:%M"))
                 del dates[deldate.strftime("%H:%M")]
             except (ValueError, KeyError): #if not valid date or date not listed in db then it will complain
                 send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\""
@@ -135,10 +132,8 @@ def submit_crontab():
 
     tmpfile = os.popen("mktemp /tmp/cron-clock-XXXXX").read() #make a temporary file in a tmpfs that we can write our cron stuff to
 
-    print(tmpfile)
     for date in dates:
-        print(date)
-        os.popen(("echo {} {} \* \* 1-5 python3 /home/pi/python/webserver/buzz.py >> "+tmpfile).format(date.split(":")[1], date.split(":")[0])+"\n") #write times to file
+        os.popen(("echo {} {} \* \* 1-5 /usr/bin/python3 /home/pi/python/webserver/buzz.py >> "+tmpfile).format(date.split(":")[1], date.split(":")[0])+"\n") #write times to file
 
     os.popen("crontab "+tmpfile) #install crontab
     os.popen("rm "+tmpfile) #remove tmpfile
