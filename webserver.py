@@ -5,12 +5,26 @@ import datetime
 import json
 import time
 
+
+
+#
+#   PATHS ARE IMPORTANT, MAKE SURE EVERYTHING IN HERE IS POINTING TO THE RIGHT PLACE
+#
+
+#---------Configuration----------
 host_name = '127.0.0.1'    # Change this to your Raspberry Pi IP address
 host_port = 8000
-
 dates = {}
-
 send_err = ""
+GPIO_PIN = 26
+timedb_path = "/home/pi/webserver/timedb.json"
+this_file_path="/home/pi/webserver"  #Keep this program in the same file as the other programs, and keep this entry up to date
+#--------------------------------
+
+
+
+
+
 
 class MyServer(BaseHTTPRequestHandler):
     """ A special implementation of BaseHTTPRequestHander for reading data from
@@ -97,13 +111,13 @@ class MyServer(BaseHTTPRequestHandler):
         global send_err
 
         # GPIO setup
-        init_gpio(26)
+        init_gpio(GPIO_PIN)
 
         if post_id == "submit":     #this is the "backend" stuff for when a browser posts the buzz button being pressed.
             if post_data == 'Buzz':
-                relay_on(26)
-                time.sleep(0.5)
-                relay_off(26)
+                relay_on(GPIO_PIN)
+                time.sleep(2)
+                relay_off(GPIO_PIN)
             print("Relay will {}".format(post_data))
 
         #for 12 hour time, use (%I-%M-%S %p)
@@ -124,7 +138,7 @@ class MyServer(BaseHTTPRequestHandler):
                 send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\" Example: 6:15"
                 self._redirect('/')
 
-        with open('timedb.json', 'w+') as fp: # On post, save time db to json to be safe.
+        with open(timedb_path, 'w+') as fp: # On post, save time db to json to be safe.
             json.dump(dates, fp)
         
         submit_crontab()
@@ -137,7 +151,7 @@ def submit_crontab():
     tmpfile = os.popen("mktemp /tmp/cron-clock-XXXXX").read() #make a temporary file in a tmpfs that we can write our cron stuff to
 
     for date in dates:
-        os.popen(("echo {} {} \* \* 1-5 /usr/bin/python3 /home/pi/python/webserver/buzz.py >> "+tmpfile).format(date.split(":")[1], date.split(":")[0])+"\n") #write times to file
+        os.popen(("echo {} {} \* \* 1-5 /usr/bin/python3 "+this_file_path+"/buzz.py >> "+tmpfile).format(date.split(":")[1], date.split(":")[0])+"\n") #write times to file
 
     os.popen("crontab "+tmpfile) #install crontab
     os.popen("rm "+tmpfile) #remove tmpfile
@@ -177,7 +191,7 @@ def relay_off(pin):
 
 if __name__ == '__main__':
     try:
-        with open('timedb.json', 'r') as fp: #load dates from last session
+        with open(timedb_path, 'r') as fp: #load dates from last session
             dates = json.load(fp)
     except FileNotFoundError:
         print(".json from last session not found, making a new one")

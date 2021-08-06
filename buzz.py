@@ -32,7 +32,7 @@ if __name__ == "__main__":
     GPIO.setup(GPIO_PIN,GPIO.OUT)
 
     relay_on(GPIO_PIN)
-    time.sleep(1.3)
+    time.sleep(3)
     relay_off(GPIO_PIN)
 
     GPIO.cleanup()
