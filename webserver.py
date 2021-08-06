@@ -5,7 +5,7 @@ import datetime
 import json
 import time
 
-host_name = '10.17.56.96'    # Change this to your Raspberry Pi IP address
+host_name = '127.0.0.1'    # Change this to your Raspberry Pi IP address
 host_port = 8000
 
 dates = {}
