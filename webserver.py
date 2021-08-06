@@ -55,6 +55,10 @@ class MyServer(BaseHTTPRequestHandler):
             <body style="width:960px; margin: 20px auto;">
             <h1>Buzzer Controls</h1>
             <br>
+            <form action="/" method="POST">
+                Reboot Pi (careful):
+                <input type="submit" name="restart" value="Restart">
+            </form>
             <p>Time and Temperature update on refresh.</p>
             <p>Current temperature is {}</p>
             <p>Current time is {}</p>
@@ -120,7 +124,9 @@ class MyServer(BaseHTTPRequestHandler):
                 relay_off(GPIO_PIN)
             print("Relay will {}".format(post_data))
 
-        #for 12 hour time, use (%I-%M-%S %p)
+        if post_id == "restart": 
+            os.popen("sudo reboot")
+            print("Relay will {}".format(post_data))
 
         if post_id == "add-time": #add time to db
             try:
