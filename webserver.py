@@ -40,7 +40,11 @@ class MyServer(BaseHTTPRequestHandler):
             <html>
             <body style="width:960px; margin: 20px auto;">
             <h1>Buzzer Controls</h1>
+            <br>
+            <p>Time and Temperature update on refresh.</p>
             <p>Current temperature is {}</p>
+            <p>Current time is {}</p>
+            <br>
             <form action="/" method="POST">
                 Cycle Relay (careful):
                 <input type="submit" name="submit" value="Buzz">
@@ -77,7 +81,7 @@ class MyServer(BaseHTTPRequestHandler):
         temp = os.popen("/opt/vc/bin/vcgencmd measure_temp").read()
         self.do_HEAD()
         print(send_err)
-        self.wfile.write(html.format(temp[5:], send_err, times_html).encode("utf-8"))
+        self.wfile.write(html.format(temp[5:], datetime.datetime.now().strftime("%H:%M:%S"), send_err, times_html).encode("utf-8"))
         send_err = ""
 
 
@@ -109,7 +113,7 @@ class MyServer(BaseHTTPRequestHandler):
                 newdate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M") #using datetime is an easy way of parsing dates so i dont need to regex things myself
                 dates[newdate.strftime("%H:%M")] = "default"
             except ValueError:  #if not a valid date then it will complain
-                send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\""
+                send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\" Example: 6:15"
                 self._redirect('/')
 
         if post_id == "del-time": #rm time from db
@@ -117,7 +121,7 @@ class MyServer(BaseHTTPRequestHandler):
                 deldate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M")
                 del dates[deldate.strftime("%H:%M")]
             except (ValueError, KeyError): #if not valid date or date not listed in db then it will complain
-                send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\""
+                send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\" Example: 6:15"
                 self._redirect('/')
 
         with open('timedb.json', 'w+') as fp: # On post, save time db to json to be safe.
