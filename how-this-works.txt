@@ -6,10 +6,13 @@ when a post request is sent to webserver.py, it handles it by activating gpio pi
 
 webserver.py also keeps a copy (timedb.json) of the buzzer times so they will survive across reboots
 
-webserver.py syncs and parses the buzzer times into pi (the user's) crontab.
+webserver.py syncs and parses the buzzer times from the web interface into pi (the default user's) crontab.
 
 cron runs buzz.py, which is actually what buzzes the buzzer on a schedule.
 
+one nice thing about this design is that webserver.py doesn't have to be running for the buzzer to go off, since cron is what runs buzz.py which in turn buzzes the buzzer.
+
+Keep in mind: If you move webserver.py or this folder out of /home/pi, there will be problems unless you adjust the CONFIGURATION section in the top of webserver.py
 
 
 nginx is being used as a proxy for webserver.py, so it provides http auth and ssl (https)
@@ -31,8 +34,6 @@ https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl
 to simplify the configuration of nginx, if I were you I would just copy nginx from this folder into /etc/ after installing nginx
 rm -r /etc/nginx
 cp -pr nginx /etc/nginx
-
-
 
 
 this raspberry pi is using ntpd to keep the time accurate. (from what i've seen, it keeps it very, very accurate)
