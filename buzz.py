@@ -8,7 +8,7 @@ GPIO.setwarnings(False)
 GPIO.setup(GPIO_PIN,GPIO.OUT)
 
 GPIO.output(GPIO_PIN,GPIO.HIGH)
-time.sleep(0.1)
+time.sleep(0.7)
 GPIO.output(GPIO_PIN,GPIO.LOW)
 
 GPIO.cleanup()
