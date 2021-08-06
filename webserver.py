@@ -89,8 +89,8 @@ class MyServer(BaseHTTPRequestHandler):
         '''
 
         times_html = ""
-
-        for d in dates:             #what a great way of doing this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        #Adding times as table into html
+        for d in dates: #what a great way of doing this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             times_html+="<tr>"
             times_html+="   <td>"+d+"</td>"
             times_html+="   <td>"+dates[d]+"</td>"
@@ -103,7 +103,7 @@ class MyServer(BaseHTTPRequestHandler):
         send_err = ""
 
 
-    def do_POST(self):                          #everytime the server recieves a post, this is run. same concept applies to the other do_whatever functions
+    def do_POST(self): #everytime the server recieves a post, this is run. same concept applies to the other do_whatever functions
         """ do_POST() can be tested using curl command 
             'curl -d "submit=On" http://server-ip-address:port' 
         """
@@ -133,7 +133,7 @@ class MyServer(BaseHTTPRequestHandler):
                 newdate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M") #using datetime is an easy way of parsing dates so i dont need to regex things myself
                 dates[newdate.strftime("%H:%M")] = "default"
             except ValueError:  #if not a valid date then it will complain
-                send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\" Example: 6:15"
+                send_err += "Invalid Time \""+post_data.replace("%3A", ":")+"\" Example: 6:15\n"
                 self._redirect('/')
 
         if post_id == "del-time": #rm time from db
@@ -141,7 +141,7 @@ class MyServer(BaseHTTPRequestHandler):
                 deldate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M")
                 del dates[deldate.strftime("%H:%M")]
             except (ValueError, KeyError): #if not valid date or date not listed in db then it will complain
-                send_err = "Invalid Time \""+post_data.replace("%3A", ":")+"\" Example: 6:15"
+                send_err += "Invalid Time \""+post_data.replace("%3A", ":")+"\" Example: 6:15\n"
                 self._redirect('/')
 
         with open(timedb_path, 'w+') as fp: # On post, save time db to json to be safe.
@@ -171,6 +171,7 @@ def init_gpio(pin):
 
 
 def relay_on(pin): #relay on function, if relay gets stuck then it will retry until it gets unstuck. if it tries more than 300 times (30 seconds) it will give up.
+    global send_err
     attempt_count = 0
     while GPIO.input(pin) != 1:
         GPIO.output(pin, GPIO.HIGH)
@@ -178,10 +179,12 @@ def relay_on(pin): #relay on function, if relay gets stuck then it will retry un
         attempt_count+=1
         if attempt_count > 1:
             print("relay stuck, retrying off")
-        if attempt_count > 300:
+        if attempt_count > 100:
+            send_err+=("Could not turn on relay on pin "+str(pin)+"\n")   
             break
 
 def relay_off(pin):
+    global send_err
     attempt_count = 0
     while GPIO.input(pin) != 0:
         GPIO.output(pin, GPIO.LOW)
@@ -189,10 +192,9 @@ def relay_off(pin):
         attempt_count+=1
         if attempt_count > 1:
             print("relay stuck, retrying off")
-        if attempt_count > 300:
+        if attempt_count > 100:
+            send_err+=("Could not turn off relay on pin "+str(pin)+"\n")   
             break
-
-
 
 
 if __name__ == '__main__':
