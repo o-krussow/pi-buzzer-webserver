@@ -12,18 +12,15 @@ import time
 #
 
 #---------Configuration----------
-host_name = '127.0.0.1'    # Change this to your Raspberry Pi IP address
-host_port = 8000
-dates = {}
-send_err = ""
+host_name = '127.0.0.1'    # Leave this if using nginx
+host_port = 8000           # this too
 GPIO_PIN = 26
 timedb_path = "/home/pi/webserver/timedb.json"
-this_file_path="/home/pi/webserver"  #Keep this program in the same file as the other programs, and keep this entry up to date
+this_file_path="/home/pi/webserver"  #This is the folder this program is kept in. Keep this program in the same folder as the other programs, and change this entry if this program is moved.
 #--------------------------------
 
-
-
-
+dates = {}
+send_err = ""
 
 
 class MyServer(BaseHTTPRequestHandler):

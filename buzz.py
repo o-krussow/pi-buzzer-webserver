@@ -31,8 +31,12 @@ if __name__ == "__main__":
     GPIO.setwarnings(False)
     GPIO.setup(GPIO_PIN,GPIO.OUT)
 
+
+    #if you want to make a custom buzz, this would be the place to do it
+    #default buzzes for 3 seconds
     relay_on(GPIO_PIN)
     time.sleep(3)
     relay_off(GPIO_PIN)
+
 
     GPIO.cleanup()

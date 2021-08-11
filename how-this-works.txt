@@ -55,7 +55,7 @@ to make sure /var/log doesnt fill up, i have a root crontab being run daily to t
 
 contents of root crontab:
 @reboot ntpdate -b pool.ntp.org
-0 0 * * * for filename in /var/log/*log; do echo -n "" > "$filename"; done; for filename in /var/log/*/*.log; do echo -n "" > "$filename"; done
+0 0 * * 0 for filename in /var/log/*log; do echo -n "" > "$filename"; done; for filename in /var/log/*/*.log; do echo -n "" > "$filename"; done
 #end
 
 
