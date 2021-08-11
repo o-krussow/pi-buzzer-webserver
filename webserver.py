@@ -53,6 +53,10 @@ class MyServer(BaseHTTPRequestHandler):
             <h1>Buzzer Controls</h1>
             <br>
             <form action="/" method="POST">
+                Power off Pi for maintence. To turn it back on, the USB power will need to be unplugged and plugged back in. (careful):
+                <input type="submit" name="poweroff" value="Power Off">
+            </form>
+            <form action="/" method="POST">
                 Reboot Pi (careful):
                 <input type="submit" name="restart" value="Restart">
             </form>
@@ -125,6 +129,10 @@ class MyServer(BaseHTTPRequestHandler):
             print("Relay will {}".format(post_data))
             os.popen("sudo reboot")
 
+        if post_id == "poweroff": 
+            print("Relay will {}".format(post_data))
+            os.popen("sudo poweroff")
+        
         if post_id == "add-time": #add time to db
             try:
                 newdate = datetime.datetime.strptime(post_data.replace("%3A", ":"), "%H:%M") #using datetime is an easy way of parsing dates so i dont need to regex things myself
