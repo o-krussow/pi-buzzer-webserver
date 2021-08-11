@@ -39,5 +39,29 @@ cp -pr nginx /etc/nginx
 this raspberry pi is using ntpd to keep the time accurate. (from what i've seen, it keeps it very, very accurate)
 What this means is that the raspberry pi sync its time with an assortment of public ntp servers.
 
+the contents of /etc/fstab:
+
+proc                  /proc           proc    defaults                  0 0
+PARTUUID=5c2ce0d6-01  /boot           vfat    ro,noatime                0 2
+PARTUUID=5c2ce0d6-02  /               ext4    defaults,noatime          0 1
+tmpfs                 /tmp            tmpfs   defaults,noatime          0 0
+tmpfs                 /var/log        tmpfs   defaults,noatime,size=16m 0 0
+
+#end
+
+swap is disabled, and the most write heavy tasks are being relegated to tmpfs for hopefully better longevity
+
+to make sure /var/log doesnt fill up, i have a root crontab being run daily to truncate logs
+
+contents of root crontab:
+@reboot ntpdate -b pool.ntp.org
+0 0 * * 0 for filename in /var/log/*log; do echo -n "" > "$filename"; done; for filename in /var/log/*/*.log; do echo -n "" > "$filename"; done
+#end
+
+
+
+
+
+
 
 
