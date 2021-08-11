@@ -35,7 +35,7 @@ if __name__ == "__main__":
     #if you want to make a custom buzz, this would be the place to do it
     #default buzzes for 3 seconds
     relay_on(GPIO_PIN)
-    time.sleep(3)
+    time.sleep(4)
     relay_off(GPIO_PIN)
 
 
