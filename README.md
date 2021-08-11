@@ -21,24 +21,24 @@
 - nginx is being used as a proxy for webserver.py, so it provides http auth and ssl (https)
 
 I generated an SSL cert using:
-'''
+```
 sudo openssl req -x509 -nodes -days 5475 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
-'''
+```
 
 If the IP of this Pi changes, this certificate needs to be regenerated using this command^^
 
 Additionally: 
-'''
+```
 sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
-'''
+```
 
 Following this [guide.](https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04)
 
 to simplify the configuration of nginx, if I were you I would just copy nginx from this folder into /etc/ after installing nginx
-'''
+```
 rm -r /etc/nginx
 cp -pr nginx /etc/nginx
-'''
+```
 
 # NTP
 
