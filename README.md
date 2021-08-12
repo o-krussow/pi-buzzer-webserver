@@ -16,6 +16,17 @@
 
 - Keep in mind: If you move webserver.py or this folder out of /home/pi, there will be problems unless you adjust the CONFIGURATION section in the top of webserver.py
 
+- /boot IS MOUNTED AS READ ONLY. Because of this, I've put packages that updated kernels would pull down on hold using apt. apt update & apt upgrade should work fine, the kernel just won't be upgraded.
+    - To update the kernel, edit /etc/fstab and (ONLY) omit the ro, part of the /boot line and reboot
+    - From this
+    ```
+    PARTUUID=5c2ce0d6-01  /boot           vfat    ro,noatime                0 2
+    ```
+    - To this
+    ```
+    PARTUUID=5c2ce0d6-01  /boot           vfat    noatime                0 2
+    ```
+
 # NGINX + SSL
 
 - nginx is being used as a proxy for webserver.py, so it provides http auth and ssl (https)
