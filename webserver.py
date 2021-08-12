@@ -53,10 +53,6 @@ class MyServer(BaseHTTPRequestHandler):
             <h1>Buzzer Controls</h1>
             <br>
             <form action="/" method="POST">
-                Power off Pi for maintence. To turn it back on, the USB power will need to be unplugged and plugged back in. (careful):
-                <input type="submit" name="poweroff" value="Power Off">
-            </form>
-            <form action="/" method="POST">
                 Reboot Pi (careful):
                 <input type="submit" name="restart" value="Restart">
             </form>
@@ -128,10 +124,6 @@ class MyServer(BaseHTTPRequestHandler):
         if post_id == "restart": 
             print("Relay will {}".format(post_data))
             os.popen("sudo reboot")
-
-        if post_id == "poweroff": 
-            print("Relay will {}".format(post_data))
-            os.popen("sudo poweroff")
         
         if post_id == "add-time": #add time to db
             try:
@@ -166,7 +158,6 @@ def submit_crontab():
 
     os.popen("crontab "+tmpfile) #install crontab
     os.popen("rm "+tmpfile) #remove tmpfile
-
 
 
 def init_gpio(pin):
