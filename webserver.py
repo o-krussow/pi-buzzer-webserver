@@ -52,6 +52,7 @@ class MyServer(BaseHTTPRequestHandler):
             <body style="width:960px; margin: 20px auto;">
             <h1>Buzzer Controls</h1>
             <br>
+            <p>Current uptime: {}</p>
             <form action="/" method="POST">
                 Reboot Pi (careful):
                 <input type="submit" name="restart" value="Restart">
@@ -94,9 +95,10 @@ class MyServer(BaseHTTPRequestHandler):
             times_html+="</tr>"
 
         temp = os.popen("/opt/vc/bin/vcgencmd measure_temp").read()
+        uptime = os.popen("uptime").read()
         self.do_HEAD()
         print(send_err)
-        self.wfile.write(html.format(temp[5:], datetime.datetime.now().strftime("%H:%M:%S"), send_err, times_html).encode("utf-8"))
+        self.wfile.write(html.format(uptime, temp[5:], datetime.datetime.now().strftime("%H:%M:%S"), send_err, times_html).encode("utf-8"))
         send_err = ""
 
 
