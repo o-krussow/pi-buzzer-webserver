@@ -14,8 +14,8 @@ import time
 #---------Configuration----------
 host_name = '127.0.0.1'    # Leave this if using nginx
 host_port = 8000           # this too
-GPIO_PIN = 26
-timedb_path = "/home/pi/webserver/timedb.json"
+GPIO_PIN = 26              # Changing this only affects the "Cycle relay" button. Relay #2 activates using GPIO_PIN = 20, and Relay #3 activates using GPIO_PIN = 21
+timedb_path = "/home/pi/webserver/timedb.json" #Path to file where times are saved so this program can display them across restarts.
 this_file_path="/home/pi/webserver"  #This is the folder this program is kept in. Keep this program in the same folder as the other programs, and change this entry if this program is moved.
 #--------------------------------
 
