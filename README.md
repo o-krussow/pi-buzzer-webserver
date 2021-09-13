@@ -18,11 +18,11 @@
 
 - /boot IS MOUNTED AS READ ONLY. Because of this, I've put packages that updated kernels would pull down on hold using apt. apt update & apt upgrade should work fine, the kernel just won't be upgraded.
     - To update the kernel, edit /etc/fstab and (ONLY) omit the ro, part of the /boot line and reboot
-    From this
+    - From this
     ```
     PARTUUID=5c2ce0d6-01  /boot           vfat    ro,noatime                0 2
     ```
-    To this
+    - To this
     ```
     PARTUUID=5c2ce0d6-01  /boot           vfat    noatime                0 2
     ```
