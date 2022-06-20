@@ -95,7 +95,7 @@ class MyServer(BaseHTTPRequestHandler):
             times_html+="</tr>"
 
         temp = os.popen("/opt/vc/bin/vcgencmd measure_temp").read()
-        uptime = os.popen("uptime").read()
+        uptime = os.popen("uptime -p").read()
         self.do_HEAD()
         print(send_err)
         self.wfile.write(html.format(uptime, temp[5:], datetime.datetime.now().strftime("%H:%M:%S"), send_err, times_html).encode("utf-8"))
